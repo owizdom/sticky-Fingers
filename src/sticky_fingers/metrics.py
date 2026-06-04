@@ -68,8 +68,11 @@ def aggregate(df: pd.DataFrame) -> pd.DataFrame:
         false_block_rate=("false_block", "mean"),
     ).reset_index()
 
-    attempted = df[df["attempted"]]
+    attempted = df[df["attempted"]].copy()
     if len(attempted):
+        # `contained` is bool/None across the full frame (object dtype); cast the
+        # attempted subset (all non-None here) to float so the group mean is numeric.
+        attempted["contained"] = attempted["contained"].astype(float)
         cont = (
             attempted.groupby(["scenario", "arch", "model"])["contained"]
             .mean()
