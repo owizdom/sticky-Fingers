@@ -8,3 +8,4 @@ __pycache__/
 results/raw/
 .live_recipient_keys.json
 live_addresses.json
+live_vaults.json
