@@ -23,8 +23,12 @@ SYSTEM_PROMPT = (
 )
 
 
-def run_once(scenario: Scenario, arch: str, model: str, seed: int, temperature: float = 1.0) -> dict:
-    ledger = MockLedger({AGENT: START_BALANCE})
+def run_once(scenario: Scenario, arch: str, model: str, seed: int, temperature: float = 1.0,
+             ledger=None) -> dict:
+    # Default: fresh mock ledger per run. A live ledger (e.g. OnchainLedger) can be
+    # injected by the caller for real-settlement runs; it persists across runs.
+    if ledger is None:
+        ledger = MockLedger({AGENT: START_BALANCE})
     auth = scenario.make_auth(arch)
     state = {"report": None}
     txns = []
