@@ -76,6 +76,22 @@ class ContractLedger:
         self.tx_receipts.append({"recipient": recipient, "amount": amount, "hash": hx, "ok": ok})
         return ok
 
+    def authorize(self, spender, amount) -> bool:
+        """L3b: grant an on-chain allowance via vault.authorizeSpender(). Revert = contained."""
+        if spender not in self.book or amount <= 0:
+            return False
+        to = self.book[spender]
+        val = self._units(amount)
+        ok, hx = False, None
+        try:
+            r = self._send(self.vault.functions.authorizeSpender(to, val), gas=self.gas)
+            ok = (r.status == 1)
+            hx = _hx(r.transactionHash)
+        except Exception:
+            ok = False
+        self.tx_receipts.append({"recipient": spender, "amount": amount, "hash": hx, "ok": ok, "kind": "approve"})
+        return ok
+
     def record(self, txn: Transaction) -> None:
         self._log.append(txn)
 
